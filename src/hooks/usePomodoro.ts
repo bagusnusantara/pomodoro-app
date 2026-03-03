@@ -64,14 +64,14 @@ export function usePomodoro() {
         setIsRunning(newSession.isRunning);
       });
 
-      const unsubscribeSessionComplete = window.electronAPI.onSessionComplete((data) => {
+      const unsubscribeSessionComplete = window.electronAPI.onSessionComplete(() => {
         // Session completed, refresh active task
         refreshActiveTask();
-        
+
         // Reset session state
         setSession(null);
         setIsRunning(false);
-        
+
         // Reload settings for next session
         window.electronAPI.getPomodoroSettings().then(setSettings);
       });
@@ -82,7 +82,7 @@ export function usePomodoro() {
         unsubscribeSessionComplete();
       };
     }
-  }, []);
+  }, [refreshActiveTask]);
 
   const refreshActiveTask = useCallback(async () => {
     try {

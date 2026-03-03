@@ -101,7 +101,7 @@ class StorageService {
     let size = 0;
     try {
       for (const key in localStorage) {
-        if (localStorage.hasOwnProperty(key) && key.startsWith(STORAGE_PREFIX)) {
+        if (Object.prototype.hasOwnProperty.call(localStorage, key) && key.startsWith(STORAGE_PREFIX)) {
           size += localStorage[key].length * 2; // UTF-16 characters
         }
       }

@@ -20,8 +20,10 @@ function TaskManager() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!formData.title.trim()) return;
+
+    if (!formData.title.trim()) {
+      return;
+    }
 
     try {
       if (editingTask) {
@@ -36,7 +38,7 @@ function TaskManager() {
           description: formData.description,
         });
       }
-      
+
       setFormData({ title: '', description: '' });
       setIsFormOpen(false);
       setEditingTask(null);
@@ -86,9 +88,15 @@ function TaskManager() {
   };
 
   const filteredTasks = tasks.filter(task => {
-    if (filter === 'all') return true;
-    if (filter === 'pending') return task.status !== 'completed';
-    if (filter === 'completed') return task.status === 'completed';
+    if (filter === 'all') {
+      return true;
+    }
+    if (filter === 'pending') {
+      return task.status !== 'completed';
+    }
+    if (filter === 'completed') {
+      return task.status === 'completed';
+    }
     return true;
   });
 

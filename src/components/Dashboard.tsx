@@ -114,7 +114,7 @@ function Dashboard() {
           <div className="stat-icon">🎯</div>
           <div className="stat-content">
             <span className="stat-value">{todayStats.focusSessions}</span>
-            <span className="stat-label">Today's Sessions</span>
+            <span className="stat-label">Today&apos;s Sessions</span>
           </div>
         </div>
 

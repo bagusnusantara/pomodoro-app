@@ -49,7 +49,9 @@ function Timer() {
   }, [skipSession]);
 
   const getSessionTypeColor = () => {
-    if (!session) return 'var(--color-focus)';
+    if (!session) {
+      return 'var(--color-focus)';
+    }
     switch (session.type) {
       case 'focus':
         return 'var(--color-focus)';
@@ -63,7 +65,9 @@ function Timer() {
   };
 
   const getSessionTypeLabel = () => {
-    if (!session) return 'Ready to Focus';
+    if (!session) {
+      return 'Ready to Focus';
+    }
     switch (session.type) {
       case 'focus':
         return 'Focus Time';

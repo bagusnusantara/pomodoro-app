@@ -17,8 +17,7 @@ function App() {
       try {
         // Load initial settings
         if (window.electronAPI) {
-          const settings = await window.electronAPI.getAllSettings();
-          console.log('[App] Initial settings loaded:', settings);
+          await window.electronAPI.getAllSettings();
         }
       } catch (error) {
         console.error('[App] Failed to initialize:', error);
