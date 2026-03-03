@@ -1,0 +1,41 @@
+.timer-page {
+  width: 100%;
+}
+
+.timer-page-header {
+  margin-bottom: 2rem;
+}
+
+.page-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.page-subtitle {
+  color: var(--text-secondary);
+  font-size: 1rem;
+}
+
+.timer-page-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.timer-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.tasks-section {
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 1024px) {
+  .timer-page-content {
+    grid-template-columns: 1fr;
+  }
+}

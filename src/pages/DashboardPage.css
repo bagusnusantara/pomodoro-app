@@ -1,0 +1,11 @@
+.dashboard-page {
+  width: 100%;
+}
+
+.dashboard-page-header {
+  margin-bottom: 2rem;
+}
+
+.dashboard-page-content {
+  max-width: 1200px;
+}

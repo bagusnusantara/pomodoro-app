@@ -1,0 +1,11 @@
+.tasks-page {
+  width: 100%;
+}
+
+.tasks-page-header {
+  margin-bottom: 2rem;
+}
+
+.tasks-page-content {
+  max-width: 900px;
+}
