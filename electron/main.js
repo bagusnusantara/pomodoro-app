@@ -9,45 +9,6 @@ let tray = null;
 let currentSession = null;
 let sessionTimer = null;
 
-// Security: Only allow specific channels
-const ALLOWED_CHANNELS = new Set([
-  // Tasks
-  'tasks:getAll',
-  'tasks:getById',
-  'tasks:create',
-  'tasks:update',
-  'tasks:delete',
-  'tasks:setActive',
-  'tasks:getActive',
-  // Pomodoro
-  'pomodoro:start',
-  'pomodoro:pause',
-  'pomodoro:reset',
-  'pomodoro:getCurrent',
-  'pomodoro:getSettings',
-  'pomodoro:updateSettings',
-  'pomodoro:getHistory',
-  // Dashboard
-  'dashboard:getStats',
-  'dashboard:getTodayStats',
-  // Settings
-  'settings:get',
-  'settings:set',
-  'settings:getAll',
-  // App
-  'app:minimize',
-  'app:maximize',
-  'app:close',
-  'app:getVersion',
-]);
-
-/**
- * Validate IPC channel
- */
-function isValidChannel(channel) {
-  return ALLOWED_CHANNELS.has(channel);
-}
-
 /**
  * Create the main application window
  */
@@ -69,7 +30,7 @@ function createWindow() {
   });
 
   // Load the app
-  const isDev = process.env.NODE_ENV === 'development';
+  const isDev = process.env.NODE_ENV === 'development' || !app.isPackaged;
   if (isDev) {
     mainWindow.loadURL('http://localhost:5173');
     mainWindow.webContents.openDevTools();
@@ -370,221 +331,205 @@ function updateDailyStats(type, durationMinutes) {
  * Setup IPC handlers
  */
 function setupIPCHandlers() {
-  ipcMain.handle('invoke', async (event, channel, ...args) => {
-    if (!isValidChannel(channel)) {
-      throw new Error(`Invalid IPC channel: ${channel}`);
-    }
-    
-    const db = getDatabase();
-    
-    switch (channel) {
-      // === TASKS ===
-      case 'tasks:getAll': {
-        return db.prepare('SELECT * FROM tasks ORDER BY created_at DESC').all();
-      }
-      
-      case 'tasks:getById': {
-        return db.prepare('SELECT * FROM tasks WHERE id = ?').get(args[0]);
-      }
-      
-      case 'tasks:create': {
-        const { title, description } = args[0];
-        const id = uuidv4();
-        db.prepare(`
-          INSERT INTO tasks (id, title, description, status, pomodoro_count, created_at, updated_at)
-          VALUES (?, ?, ?, 'pending', 0, datetime('now'), datetime('now'))
-        `).run(id, title, description || '');
-        return db.prepare('SELECT * FROM tasks WHERE id = ?').get(id);
-      }
-      
-      case 'tasks:update': {
-        const { id, title, description, status } = args[0];
-        db.prepare(`
-          UPDATE tasks 
-          SET title = ?, description = ?, status = ?, updated_at = datetime('now')
-          WHERE id = ?
-        `).run(title, description, status, id);
-        return db.prepare('SELECT * FROM tasks WHERE id = ?').get(id);
-      }
-      
-      case 'tasks:delete': {
-        db.prepare('DELETE FROM tasks WHERE id = ?').run(args[0]);
-        return { success: true };
-      }
-      
-      case 'tasks:setActive': {
-        // Clear previous active task
-        db.prepare("UPDATE tasks SET status = 'pending' WHERE status = 'in_progress'").run();
-        // Set new active task
-        db.prepare("UPDATE tasks SET status = 'in_progress' WHERE id = ?").run(args[0]);
-        return db.prepare('SELECT * FROM tasks WHERE id = ?').get(args[0]);
-      }
-      
-      case 'tasks:getActive': {
-        return db.prepare("SELECT * FROM tasks WHERE status = 'in_progress'").get();
-      }
-      
-      // === POMODORO ===
-      case 'pomodoro:start': {
-        handleStartPomodoro();
-        return currentSession;
-      }
-      
-      case 'pomodoro:pause': {
-        if (currentSession) {
-          currentSession.isRunning = false;
-          if (sessionTimer) {
-            clearInterval(sessionTimer);
-            sessionTimer = null;
-          }
-        }
-        return currentSession;
-      }
-      
-      case 'pomodoro:reset': {
-        if (sessionTimer) {
-          clearInterval(sessionTimer);
-          sessionTimer = null;
-        }
-        currentSession = null;
-        return { success: true };
-      }
-      
-      case 'pomodoro:getCurrent': {
-        return currentSession;
-      }
-      
-      case 'pomodoro:getSettings': {
-        const settings = db.prepare('SELECT key, value FROM settings').all();
-        const result = {};
-        settings.forEach(s => { result[s.key] = s.value; });
-        return result;
-      }
-      
-      case 'pomodoro:updateSettings': {
-        const settings = args[0];
-        const updateStmt = db.prepare('UPDATE settings SET value = ? WHERE key = ?');
-        for (const [key, value] of Object.entries(settings)) {
-          updateStmt.run(String(value), key);
-        }
-        return { success: true };
-      }
-      
-      case 'pomodoro:getHistory': {
-        const { limit = 30, type } = args[0] || {};
-        let query = 'SELECT * FROM pomodoro_sessions';
-        const params = [];
-        
-        if (type) {
-          query += ' WHERE type = ?';
-          params.push(type);
-        }
-        
-        query += ' ORDER BY completed_at DESC';
-        
-        if (limit) {
-          query += ' LIMIT ?';
-          params.push(limit);
-        }
-        
-        return db.prepare(query).all(...params);
-      }
-      
-      // === DASHBOARD ===
-      case 'dashboard:getStats': {
-        const totalSessions = db.prepare('SELECT COUNT(*) as count FROM pomodoro_sessions WHERE type = ?').get('focus');
-        const totalMinutes = db.prepare('SELECT COALESCE(SUM(duration), 0) as total FROM pomodoro_sessions WHERE type = ?').get('focus');
-        const completedTasks = db.prepare('SELECT COUNT(*) as count FROM tasks WHERE status = ?').get('completed');
-        const totalTasks = db.prepare('SELECT COUNT(*) as count FROM tasks').get();
-        
-        return {
-          totalFocusSessions: totalSessions.count,
-          totalFocusMinutes: Math.round(totalMinutes.total),
-          completedTasks: completedTasks.count,
-          totalTasks: totalTasks.count,
-        };
-      }
-      
-      case 'dashboard:getTodayStats': {
-        const today = new Date().toISOString().split('T')[0];
-        const todayStats = db.prepare('SELECT * FROM daily_stats WHERE date = ?').get(today);
-        
-        if (!todayStats) {
-          return {
-            date: today,
-            focusSessions: 0,
-            totalFocusMinutes: 0,
-            completedTasks: 0,
-          };
-        }
-        
-        return todayStats;
-      }
-      
-      // === SETTINGS ===
-      case 'settings:get': {
-        return db.prepare('SELECT value FROM settings WHERE key = ?').get(args[0]);
-      }
-      
-      case 'settings:set': {
-        const [key, value] = args;
-        db.prepare('UPDATE settings SET value = ? WHERE key = ?').run(String(value), key);
-        return { success: true };
-      }
-      
-      case 'settings:getAll': {
-        const settings = db.prepare('SELECT key, value FROM settings').all();
-        const result = {};
-        settings.forEach(s => { result[s.key] = s.value; });
-        return result;
-      }
-      
-      // === APP ===
-      case 'app:minimize': {
-        if (mainWindow) mainWindow.minimize();
-        return { success: true };
-      }
-      
-      case 'app:maximize': {
-        if (mainWindow) {
-          if (mainWindow.isMaximized()) {
-            mainWindow.unmaximize();
-          } else {
-            mainWindow.maximize();
-          }
-        }
-        return { success: true };
-      }
-      
-      case 'app:close': {
-        if (mainWindow) mainWindow.close();
-        return { success: true };
-      }
-      
-      case 'app:getVersion': {
-        return app.getVersion();
-      }
-      
-      default:
-        throw new Error(`Unhandled IPC channel: ${channel}`);
-    }
+  const db = () => getDatabase();
+
+  // === TASKS ===
+  ipcMain.handle('tasks:getAll', async () => {
+    return db().prepare('SELECT * FROM tasks ORDER BY created_at DESC').all();
   });
-  
-  // Subscribe channels (for events)
-  ipcMain.on('subscribe', (event, channel) => {
-    if (!isValidChannel(channel)) {
-      throw new Error(`Invalid IPC channel: ${channel}`);
+
+  ipcMain.handle('tasks:getById', async (event, id) => {
+    return db().prepare('SELECT * FROM tasks WHERE id = ?').get(id);
+  });
+
+  ipcMain.handle('tasks:create', async (event, { title, description }) => {
+    const id = uuidv4();
+    db().prepare(`
+      INSERT INTO tasks (id, title, description, status, pomodoro_count, created_at, updated_at)
+      VALUES (?, ?, ?, 'pending', 0, datetime('now'), datetime('now'))
+    `).run(id, title, description || '');
+    return db().prepare('SELECT * FROM tasks WHERE id = ?').get(id);
+  });
+
+  ipcMain.handle('tasks:update', async (event, { id, title, description, status }) => {
+    db().prepare(`
+      UPDATE tasks 
+      SET title = ?, description = ?, status = ?, updated_at = datetime('now')
+      WHERE id = ?
+    `).run(title, description, status, id);
+    return db().prepare('SELECT * FROM tasks WHERE id = ?').get(id);
+  });
+
+  ipcMain.handle('tasks:delete', async (event, id) => {
+    db().prepare('DELETE FROM tasks WHERE id = ?').run(id);
+    return { success: true };
+  });
+
+  ipcMain.handle('tasks:setActive', async (event, id) => {
+    db().prepare("UPDATE tasks SET status = 'pending' WHERE status = 'in_progress'").run();
+    db().prepare("UPDATE tasks SET status = 'in_progress' WHERE id = ?").run(id);
+    return db().prepare('SELECT * FROM tasks WHERE id = ?').get(id);
+  });
+
+  ipcMain.handle('tasks:getActive', async () => {
+    return db().prepare("SELECT * FROM tasks WHERE status = 'in_progress'").get();
+  });
+
+  // === POMODORO ===
+  ipcMain.handle('pomodoro:start', async () => {
+    handleStartPomodoro();
+    return currentSession;
+  });
+
+  ipcMain.handle('pomodoro:pause', async () => {
+    if (currentSession) {
+      currentSession.isRunning = false;
+      if (sessionTimer) {
+        clearInterval(sessionTimer);
+        sessionTimer = null;
+      }
     }
+    return currentSession;
+  });
+
+  ipcMain.handle('pomodoro:reset', async () => {
+    if (sessionTimer) {
+      clearInterval(sessionTimer);
+      sessionTimer = null;
+    }
+    currentSession = null;
+    return { success: true };
+  });
+
+  ipcMain.handle('pomodoro:getCurrent', async () => {
+    return currentSession;
+  });
+
+  ipcMain.handle('pomodoro:getSettings', async () => {
+    const settings = db().prepare('SELECT key, value FROM settings').all();
+    const result = {};
+    settings.forEach(s => { result[s.key] = s.value; });
+    return result;
+  });
+
+  ipcMain.handle('pomodoro:updateSettings', async (event, settings) => {
+    const updateStmt = db().prepare('UPDATE settings SET value = ? WHERE key = ?');
+    for (const [key, value] of Object.entries(settings)) {
+      updateStmt.run(String(value), key);
+    }
+    return { success: true };
+  });
+
+  ipcMain.handle('pomodoro:getHistory', async (event, { limit = 30, type } = {}) => {
+    let query = 'SELECT * FROM pomodoro_sessions';
+    const params = [];
+    
+    if (type) {
+      query += ' WHERE type = ?';
+      params.push(type);
+    }
+    
+    query += ' ORDER BY completed_at DESC';
+    
+    if (limit) {
+      query += ' LIMIT ?';
+      params.push(limit);
+    }
+    
+    return db().prepare(query).all(...params);
+  });
+
+  // === DASHBOARD ===
+  ipcMain.handle('dashboard:getStats', async () => {
+    const totalSessions = db().prepare('SELECT COUNT(*) as count FROM pomodoro_sessions WHERE type = ?').get('focus');
+    const totalMinutes = db().prepare('SELECT COALESCE(SUM(duration), 0) as total FROM pomodoro_sessions WHERE type = ?').get('focus');
+    const completedTasks = db().prepare('SELECT COUNT(*) as count FROM tasks WHERE status = ?').get('completed');
+    const totalTasks = db().prepare('SELECT COUNT(*) as count FROM tasks').get();
+    
+    return {
+      totalFocusSessions: totalSessions.count,
+      totalFocusMinutes: Math.round(totalMinutes.total),
+      completedTasks: completedTasks.count,
+      totalTasks: totalTasks.count,
+    };
+  });
+
+  ipcMain.handle('dashboard:getTodayStats', async () => {
+    const today = new Date().toISOString().split('T')[0];
+    const todayStats = db().prepare('SELECT * FROM daily_stats WHERE date = ?').get(today);
+    
+    if (!todayStats) {
+      return {
+        date: today,
+        focusSessions: 0,
+        totalFocusMinutes: 0,
+        completedTasks: 0,
+      };
+    }
+    
+    return todayStats;
+  });
+
+  // === SETTINGS ===
+  ipcMain.handle('settings:get', async (event, key) => {
+    return db().prepare('SELECT value FROM settings WHERE key = ?').get(key);
+  });
+
+  ipcMain.handle('settings:set', async (event, key, value) => {
+    db().prepare('UPDATE settings SET value = ? WHERE key = ?').run(String(value), key);
+    return { success: true };
+  });
+
+  ipcMain.handle('settings:getAll', async () => {
+    const settings = db().prepare('SELECT key, value FROM settings').all();
+    const result = {};
+    settings.forEach(s => { result[s.key] = s.value; });
+    return result;
+  });
+
+  // === APP ===
+  ipcMain.handle('app:minimize', async () => {
+    if (mainWindow) mainWindow.minimize();
+    return { success: true };
+  });
+
+  ipcMain.handle('app:maximize', async () => {
+    if (mainWindow) {
+      if (mainWindow.isMaximized()) {
+        mainWindow.unmaximize();
+      } else {
+        mainWindow.maximize();
+      }
+    }
+    return { success: true };
+  });
+
+  ipcMain.handle('app:close', async () => {
+    if (mainWindow) mainWindow.close();
+    return { success: true };
+  });
+
+  ipcMain.handle('app:getVersion', async () => {
+    return app.getVersion();
   });
 }
 
 /**
  * App lifecycle events
  */
-app.whenReady().then(() => {
-  initDatabase();
-  setupIPCHandlers();
-  createWindow();
+app.whenReady().then(async () => {
+  try {
+    console.log('[Main] Initializing app...');
+    initDatabase();
+    console.log('[Main] Database initialized');
+    setupIPCHandlers();
+    console.log('[Main] IPC handlers registered');
+    createWindow();
+    console.log('[Main] Window created');
+  } catch (error) {
+    console.error('[Main] Failed to initialize:', error);
+    throw error;
+  }
 });
 
 app.on('window-all-closed', () => {

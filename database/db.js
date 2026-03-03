@@ -8,8 +8,9 @@ let db = null;
  * Get the database path based on the environment
  */
 function getDatabasePath() {
-  if (process.env.NODE_ENV === 'development') {
-    return path.join(__dirname, '..', 'data', 'pomotask.db');
+  const isDev = process.env.NODE_ENV === 'development' || !app.isPackaged;
+  if (isDev) {
+    return path.join(__dirname, '..', '..', 'data', 'pomotask.db');
   }
   return path.join(app.getPath('userData'), 'pomotask.db');
 }
