@@ -1,5 +1,5 @@
 {
-  "name": "pomotask",
+  "name": "pomodoro-app",
   "version": "1.0.0",
   "description": "A Pomodoro Timer + Task Manager desktop application",
   "main": "electron/main.js",
@@ -26,7 +26,7 @@
     "react",
     "productivity"
   ],
-  "author": "PomoTask Team",
+  "author": "Bagus Nusantara",
   "license": "MIT",
   "devDependencies": {
     "@testing-library/jest-dom": "^6.4.2",

@@ -87,8 +87,8 @@
   },
   "publish": {
     "provider": "github",
-    "owner": "your-username",
-    "repo": "pomotask",
+    "owner": "bagusnusantara",
+    "repo": "pomodoro-app",
     "releaseType": "release"
   }
 }

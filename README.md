@@ -1,8 +1,8 @@
-# PomoTask
+# Pomodoro App
 
 A production-ready Electron desktop application combining a Pomodoro Timer with Task Management. Built with modern technologies and best practices for security, performance, and maintainability.
 
-![PomoTask](./build/icon.png)
+![Pomodoro App](./build/icon.png)
 
 ## Features
 
@@ -48,7 +48,7 @@ A production-ready Electron desktop application combining a Pomodoro Timer with 
 ## Project Structure
 
 ```
-pomotask/
+pomodoro-app/
 ├── .github/
 │   └── workflows/
 │       └── release.yml          # GitHub Actions CI/CD
@@ -113,8 +113,8 @@ pomotask/
 ### Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/pomotask.git
-cd pomotask
+git clone https://github.com/bagusnusantara/pomodoro-app.git
+cd pomodoro-app
 ```
 
 ### Install Dependencies
@@ -332,7 +332,7 @@ CREATE TABLE daily_stats (
 
 ## Contributing
 
-1. Fork the repository
+1. Fork the repository: https://github.com/bagusnusantara/pomodoro-app
 2. Create a feature branch: `git checkout -b feature/my-feature`
 3. Commit changes: `git commit -am 'Add new feature'`
 4. Push to branch: `git push origin feature/my-feature`
