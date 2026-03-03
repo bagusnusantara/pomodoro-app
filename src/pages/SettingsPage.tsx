@@ -56,7 +56,7 @@ function SettingsPage() {
   const handleSave = async () => {
     setSaving(true);
     try {
-      await updateSettings(localSettings);
+      await updateSettings(localSettings as Record<string, string>);
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
     } catch (error) {

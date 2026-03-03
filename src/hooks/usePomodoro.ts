@@ -28,6 +28,15 @@ export function usePomodoro() {
   const [settings, setSettings] = useState<Record<string, string>>({});
   const unsubscribeRef = useRef<(() => void) | null>(null);
 
+  const refreshActiveTask = useCallback(async () => {
+    try {
+      const task = await window.electronAPI.getActiveTask();
+      setActiveTask(task || null);
+    } catch (error) {
+      console.error('Failed to refresh active task:', error);
+    }
+  }, []);
+
   // Load settings and active task on mount
   useEffect(() => {
     const init = async () => {
@@ -83,15 +92,6 @@ export function usePomodoro() {
       };
     }
   }, [refreshActiveTask]);
-
-  const refreshActiveTask = useCallback(async () => {
-    try {
-      const task = await window.electronAPI.getActiveTask();
-      setActiveTask(task || null);
-    } catch (error) {
-      console.error('Failed to refresh active task:', error);
-    }
-  }, []);
 
   const startSession = useCallback(async () => {
     try {
