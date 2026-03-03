@@ -141,7 +141,7 @@ jobs:
                 }
               ],
               "ignore_labels": ["skip-changelog"],
-              "template": "${{ github.event.repository.name }} ${{ github.ref_name }}\n\n## Changes\n\n${{ changes }}\n\n**Full Changelog**: https://github.com/${{ github.repository }}/compare/${{ fromTag }}...${{ toTag }}"
+              "template": "#{{OWNER}}/#{{REPO}} #{{TAG}}\n\n## Changes\n\n#{{CHANGES}}\n\n**Full Changelog**: https://github.com/#{{OWNER}}/#{{REPO}}/compare/#{{FROM_TAG}}...#{{TO_TAG}}"
             }
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
