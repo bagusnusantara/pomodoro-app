@@ -5,11 +5,16 @@ interface ElectronAPI {
   getTasks: () => Promise<Task[]>;
   getTaskById: (id: string) => Promise<Task>;
   createTask: (task: { title: string; description?: string }) => Promise<Task>;
-  updateTask: (task: { id: string; title: string; description?: string; status?: string }) => Promise<Task>;
+  updateTask: (task: {
+    id: string;
+    title: string;
+    description?: string;
+    status?: string;
+  }) => Promise<Task>;
   deleteTask: (id: string) => Promise<{ success: boolean }>;
   setActiveTask: (id: string) => Promise<Task>;
   getActiveTask: () => Promise<Task | undefined>;
-  
+
   // Pomodoro
   startPomodoro: () => Promise<PomodoroSession>;
   pausePomodoro: () => Promise<PomodoroSession>;
@@ -18,26 +23,28 @@ interface ElectronAPI {
   getPomodoroSettings: () => Promise<Record<string, string>>;
   updatePomodoroSettings: (settings: Record<string, string>) => Promise<{ success: boolean }>;
   getPomodoroHistory: (options?: { limit?: number; type?: string }) => Promise<PomodoroSession[]>;
-  
+
   // Dashboard
   getDashboardStats: () => Promise<DashboardStats>;
   getTodayStats: () => Promise<DailyStats>;
-  
+
   // Settings
   getSetting: (key: string) => Promise<{ value: string } | undefined>;
   setSetting: (key: string, value: string) => Promise<{ success: boolean }>;
   getAllSettings: () => Promise<Record<string, string>>;
-  
+
   // App
   minimizeWindow: () => Promise<{ success: boolean }>;
   maximizeWindow: () => Promise<{ success: boolean }>;
   closeWindow: () => Promise<{ success: boolean }>;
   getVersion: () => Promise<string>;
-  
+
   // Event listeners
   onSessionStarted: (callback: (session: PomodoroSession) => void) => () => void;
   onSessionComplete: (callback: (data: { type: string }) => void) => () => void;
-  onPomodoroTick: (callback: (data: { remaining: number; isRunning: boolean }) => void) => () => void;
+  onPomodoroTick: (
+    callback: (data: { remaining: number; isRunning: boolean }) => void
+  ) => () => void;
   onNotification: (callback: (data: { title: string; body: string }) => void) => () => void;
   removeAllListeners: () => void;
 }

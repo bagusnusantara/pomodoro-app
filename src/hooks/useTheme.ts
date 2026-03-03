@@ -37,7 +37,7 @@ export function useTheme() {
     const newTheme = theme === 'dark' ? 'light' : 'dark';
     setTheme(newTheme);
     document.documentElement.setAttribute('data-theme', newTheme);
-    
+
     try {
       if (window.electronAPI) {
         await window.electronAPI.setSetting('dark_mode', newTheme === 'dark' ? 'true' : 'false');

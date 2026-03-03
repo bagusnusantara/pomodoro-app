@@ -1,5 +1,14 @@
 import { useState, useEffect } from 'react';
-import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title } from 'chart.js';
+import {
+  Chart as ChartJS,
+  ArcElement,
+  Tooltip,
+  Legend,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+} from 'chart.js';
 import { Pie, Bar } from 'react-chartjs-2';
 import { useDashboard } from '@hooks/useDashboard';
 import './Dashboard.css';
@@ -100,11 +109,11 @@ function Dashboard() {
       <div className="dashboard-header">
         <h2 className="dashboard-title">Dashboard</h2>
         <p className="dashboard-subtitle">
-          {new Date().toLocaleDateString('en-US', { 
-            weekday: 'long', 
-            year: 'numeric', 
-            month: 'long', 
-            day: 'numeric' 
+          {new Date().toLocaleDateString('en-US', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
           })}
         </p>
       </div>

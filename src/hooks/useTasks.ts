@@ -32,7 +32,7 @@ export function useTasks() {
   const createTask = useCallback(async (taskData: { title: string; description?: string }) => {
     try {
       const newTask = await window.electronAPI.createTask(taskData);
-      setTasks(prev => [newTask, ...prev]);
+      setTasks((prev) => [newTask, ...prev]);
       return newTask;
     } catch (err) {
       setError('Failed to create task');
@@ -41,27 +41,25 @@ export function useTasks() {
     }
   }, []);
 
-  const updateTask = useCallback(async (taskData: { 
-    id: string; 
-    title: string; 
-    description?: string; 
-    status?: string 
-  }) => {
-    try {
-      const updatedTask = await window.electronAPI.updateTask(taskData);
-      setTasks(prev => prev.map(t => t.id === updatedTask.id ? updatedTask : t));
-      return updatedTask;
-    } catch (err) {
-      setError('Failed to update task');
-      console.error('Failed to update task:', err);
-      throw err;
-    }
-  }, []);
+  const updateTask = useCallback(
+    async (taskData: { id: string; title: string; description?: string; status?: string }) => {
+      try {
+        const updatedTask = await window.electronAPI.updateTask(taskData);
+        setTasks((prev) => prev.map((t) => (t.id === updatedTask.id ? updatedTask : t)));
+        return updatedTask;
+      } catch (err) {
+        setError('Failed to update task');
+        console.error('Failed to update task:', err);
+        throw err;
+      }
+    },
+    []
+  );
 
   const deleteTask = useCallback(async (taskId: string) => {
     try {
       await window.electronAPI.deleteTask(taskId);
-      setTasks(prev => prev.filter(t => t.id !== taskId));
+      setTasks((prev) => prev.filter((t) => t.id !== taskId));
     } catch (err) {
       setError('Failed to delete task');
       console.error('Failed to delete task:', err);
@@ -72,10 +70,13 @@ export function useTasks() {
   const setActiveTask = useCallback(async (taskId: string) => {
     try {
       const updatedTask = await window.electronAPI.setActiveTask(taskId);
-      setTasks(prev => prev.map(t => ({
-        ...t,
-        status: t.id === taskId ? 'in_progress' : t.status === 'in_progress' ? 'pending' : t.status,
-      })));
+      setTasks((prev) =>
+        prev.map((t) => ({
+          ...t,
+          status:
+            t.id === taskId ? 'in_progress' : t.status === 'in_progress' ? 'pending' : t.status,
+        }))
+      );
       return updatedTask;
     } catch (err) {
       setError('Failed to set active task');

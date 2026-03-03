@@ -1,6 +1,6 @@
 /**
  * Notification Service
- * 
+ *
  * Handles desktop notifications for session events
  */
 
@@ -102,7 +102,7 @@ class NotificationService {
       },
       long_break: {
         title: '🌴 Long Break Complete!',
-        body: 'You\'re refreshed! Let\'s get back to work.',
+        body: "You're refreshed! Let's get back to work.",
       },
     };
 

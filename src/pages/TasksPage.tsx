@@ -8,7 +8,7 @@ function TasksPage() {
         <h1 className="page-title">Task Manager</h1>
         <p className="page-subtitle">Organize and track your tasks</p>
       </div>
-      
+
       <div className="tasks-page-content">
         <TaskManager />
       </div>

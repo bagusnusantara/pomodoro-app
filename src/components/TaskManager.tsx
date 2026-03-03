@@ -47,7 +47,7 @@ function TaskManager() {
     }
   };
 
-  const handleEdit = (task: typeof tasks[0]) => {
+  const handleEdit = (task: (typeof tasks)[0]) => {
     setFormData({
       title: task.title,
       description: task.description || '',
@@ -74,7 +74,7 @@ function TaskManager() {
     }
   };
 
-  const handleComplete = async (task: typeof tasks[0]) => {
+  const handleComplete = async (task: (typeof tasks)[0]) => {
     try {
       await updateTask({
         id: task.id,
@@ -87,7 +87,7 @@ function TaskManager() {
     }
   };
 
-  const filteredTasks = tasks.filter(task => {
+  const filteredTasks = tasks.filter((task) => {
     if (filter === 'all') {
       return true;
     }
@@ -100,8 +100,8 @@ function TaskManager() {
     return true;
   });
 
-  const pendingTasks = filteredTasks.filter(t => t.status !== 'completed');
-  const completedTasks = filteredTasks.filter(t => t.status === 'completed');
+  const pendingTasks = filteredTasks.filter((t) => t.status !== 'completed');
+  const completedTasks = filteredTasks.filter((t) => t.status === 'completed');
 
   return (
     <div className="task-manager">
@@ -182,16 +182,14 @@ function TaskManager() {
         {pendingTasks.length > 0 && (
           <div className="task-section">
             <h4 className="section-title">Pending</h4>
-            {pendingTasks.map(task => (
+            {pendingTasks.map((task) => (
               <div
                 key={task.id}
                 className={`task-item ${task.status === 'in_progress' ? 'active' : ''}`}
               >
                 <div className="task-content">
                   <h5 className="task-name">{task.title}</h5>
-                  {task.description && (
-                    <p className="task-description">{task.description}</p>
-                  )}
+                  {task.description && <p className="task-description">{task.description}</p>}
                   <div className="task-meta">
                     <span className="task-pomodoros">🍅 {task.pomodoro_count}</span>
                     <span className="task-date">
@@ -218,11 +216,7 @@ function TaskManager() {
                       </button>
                     </>
                   )}
-                  <button
-                    className="action-btn"
-                    onClick={() => handleEdit(task)}
-                    title="Edit"
-                  >
+                  <button className="action-btn" onClick={() => handleEdit(task)} title="Edit">
                     ✎
                   </button>
                   <button
@@ -241,13 +235,11 @@ function TaskManager() {
         {completedTasks.length > 0 && (
           <div className="task-section">
             <h4 className="section-title">Completed</h4>
-            {completedTasks.map(task => (
+            {completedTasks.map((task) => (
               <div key={task.id} className="task-item completed">
                 <div className="task-content">
                   <h5 className="task-name">{task.title}</h5>
-                  {task.description && (
-                    <p className="task-description">{task.description}</p>
-                  )}
+                  {task.description && <p className="task-description">{task.description}</p>}
                   <div className="task-meta">
                     <span className="task-pomodoros">🍅 {task.pomodoro_count}</span>
                     <span className="task-date">
@@ -263,11 +255,7 @@ function TaskManager() {
                   >
                     ↩
                   </button>
-                  <button
-                    className="action-btn"
-                    onClick={() => handleEdit(task)}
-                    title="Edit"
-                  >
+                  <button className="action-btn" onClick={() => handleEdit(task)} title="Edit">
                     ✎
                   </button>
                   <button

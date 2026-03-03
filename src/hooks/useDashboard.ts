@@ -46,10 +46,10 @@ export function useDashboard() {
         window.electronAPI.getDashboardStats(),
         window.electronAPI.getTodayStats(),
       ]);
-      
+
       setStats(dashboardStats);
       setTodayStats(today);
-      
+
       // Generate weekly data (mock data for now, can be extended with actual history)
       generateWeeklyData(today.totalFocusMinutes);
     } catch (error) {
@@ -63,14 +63,14 @@ export function useDashboard() {
     // Generate last 7 days labels
     const labels: string[] = [];
     const data: number[] = [];
-    
+
     for (let i = 6; i >= 0; i--) {
       const date = new Date();
       date.setDate(date.getDate() - i);
-      
+
       const dayLabel = date.toLocaleDateString('en-US', { weekday: 'short' });
       labels.push(dayLabel);
-      
+
       // For today, use actual data; for past days, generate mock data
       if (i === 0) {
         data.push(todayMinutes);
@@ -79,7 +79,7 @@ export function useDashboard() {
         data.push(Math.floor(Math.random() * 120) + 30);
       }
     }
-    
+
     setWeeklyData({ labels, data });
   };
 

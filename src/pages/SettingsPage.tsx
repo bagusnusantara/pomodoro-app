@@ -41,12 +41,12 @@ function SettingsPage() {
   }, [settings]);
 
   const handleChange = (key: keyof SettingsState, value: string) => {
-    setLocalSettings(prev => ({ ...prev, [key]: value }));
+    setLocalSettings((prev) => ({ ...prev, [key]: value }));
     setSaved(false);
   };
 
   const handleToggle = (key: keyof SettingsState) => {
-    setLocalSettings(prev => ({
+    setLocalSettings((prev) => ({
       ...prev,
       [key]: prev[key] === 'true' ? 'false' : 'true',
     }));
@@ -76,9 +76,7 @@ function SettingsPage() {
       <div className="settings-content">
         <div className="settings-section">
           <h2 className="section-title">Timer Durations</h2>
-          <p className="section-description">
-            Set the length of your focus sessions and breaks
-          </p>
+          <p className="section-description">Set the length of your focus sessions and breaks</p>
 
           <div className="settings-grid">
             <div className="setting-item">
@@ -134,9 +132,7 @@ function SettingsPage() {
 
         <div className="settings-section">
           <h2 className="section-title">Automation</h2>
-          <p className="section-description">
-            Automate your workflow with these options
-          </p>
+          <p className="section-description">Automate your workflow with these options</p>
 
           <div className="settings-list">
             <div className="setting-toggle">
@@ -188,11 +184,7 @@ function SettingsPage() {
 
         <div className="settings-actions">
           {saved && <span className="save-message">Settings saved!</span>}
-          <button
-            className="btn btn-primary"
-            onClick={handleSave}
-            disabled={saving}
-          >
+          <button className="btn btn-primary" onClick={handleSave} disabled={saving}>
             {saving ? 'Saving...' : 'Save Settings'}
           </button>
         </div>

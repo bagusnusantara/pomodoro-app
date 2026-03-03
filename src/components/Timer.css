@@ -53,7 +53,9 @@
 }
 
 .timer-ring-progress {
-  transition: stroke-dashoffset 1s linear, stroke 0.3s ease;
+  transition:
+    stroke-dashoffset 1s linear,
+    stroke 0.3s ease;
 }
 
 .timer-time {

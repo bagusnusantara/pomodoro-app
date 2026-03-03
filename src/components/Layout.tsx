@@ -29,11 +29,17 @@ function Layout({ children }: LayoutProps) {
             <span className="nav-icon">📋</span>
             <span className="nav-label">Tasks</span>
           </NavLink>
-          <NavLink to="/dashboard" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
+          <NavLink
+            to="/dashboard"
+            className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+          >
             <span className="nav-icon">📊</span>
             <span className="nav-label">Dashboard</span>
           </NavLink>
-          <NavLink to="/settings" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
+          <NavLink
+            to="/settings"
+            className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+          >
             <span className="nav-icon">⚙️</span>
             <span className="nav-label">Settings</span>
           </NavLink>
@@ -47,9 +53,7 @@ function Layout({ children }: LayoutProps) {
       </aside>
 
       <main className="main-content">
-        <div className="content-wrapper">
-          {children}
-        </div>
+        <div className="content-wrapper">{children}</div>
       </main>
     </div>
   );

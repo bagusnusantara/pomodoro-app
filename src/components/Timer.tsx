@@ -89,11 +89,7 @@ function Timer() {
           <span className="session-type" style={{ color: primaryColor }}>
             {getSessionTypeLabel()}
           </span>
-          {activeTask && (
-            <span className="active-task">
-              📌 {activeTask.title}
-            </span>
-          )}
+          {activeTask && <span className="active-task">📌 {activeTask.title}</span>}
         </div>
 
         <div className="timer-display">
@@ -126,11 +122,7 @@ function Timer() {
         </div>
 
         <div className="timer-controls">
-          <button
-            className="control-btn control-btn-secondary"
-            onClick={handleReset}
-            title="Reset"
-          >
+          <button className="control-btn control-btn-secondary" onClick={handleReset} title="Reset">
             ↺
           </button>
           <button
@@ -141,11 +133,7 @@ function Timer() {
             {isRunning ? '⏸ Pause' : '▶ Start'}
           </button>
           {session && (
-            <button
-              className="control-btn control-btn-secondary"
-              onClick={handleSkip}
-              title="Skip"
-            >
+            <button className="control-btn control-btn-secondary" onClick={handleSkip} title="Skip">
               ⏭
             </button>
           )}
@@ -153,7 +141,9 @@ function Timer() {
 
         {!session && (
           <div className="timer-hint">
-            <p className="text-secondary">Select a task to start focusing, or start without a task</p>
+            <p className="text-secondary">
+              Select a task to start focusing, or start without a task
+            </p>
           </div>
         )}
       </div>

@@ -9,12 +9,12 @@ function TimerPage() {
         <h1 className="page-title">Pomodoro Timer</h1>
         <p className="page-subtitle">Stay focused and productive</p>
       </div>
-      
+
       <div className="timer-page-content">
         <div className="timer-section">
           <Timer />
         </div>
-        
+
         <div className="tasks-section">
           <TaskManager />
         </div>

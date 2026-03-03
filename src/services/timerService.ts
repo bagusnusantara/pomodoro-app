@@ -1,6 +1,6 @@
 /**
  * Timer Service
- * 
+ *
  * Utility functions for time formatting and calculations
  */
 
@@ -20,13 +20,13 @@ export function formatTime(ms: number): string {
 export function formatDuration(ms: number): string {
   const totalSeconds = Math.floor(ms / 1000);
   const minutes = Math.floor(totalSeconds / 60);
-  
+
   if (minutes >= 60) {
     const hours = Math.floor(minutes / 60);
     const remainingMinutes = minutes % 60;
     return `${hours}h ${remainingMinutes}m`;
   }
-  
+
   return `${minutes}m`;
 }
 
@@ -101,7 +101,7 @@ export function getEstimatedCompletion(remainingMs: number): Date {
 export function formatTimeUntil(remainingMs: number): string {
   const totalSeconds = Math.floor(remainingMs / 1000);
   const minutes = Math.floor(totalSeconds / 60);
-  
+
   if (minutes === 0) {
     return 'Less than a minute';
   } else if (minutes === 1) {
@@ -109,13 +109,13 @@ export function formatTimeUntil(remainingMs: number): string {
   } else if (minutes < 60) {
     return `${minutes} minutes`;
   }
-  
+
   const hours = Math.floor(minutes / 60);
   const remainingMinutes = minutes % 60;
-  
+
   if (remainingMinutes === 0) {
     return `${hours} hour${hours > 1 ? 's' : ''}`;
   }
-  
+
   return `${hours}h ${remainingMinutes}m`;
 }

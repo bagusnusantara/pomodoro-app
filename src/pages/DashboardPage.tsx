@@ -8,7 +8,7 @@ function DashboardPage() {
         <h1 className="page-title">Dashboard</h1>
         <p className="page-subtitle">Track your productivity and progress</p>
       </div>
-      
+
       <div className="dashboard-page-content">
         <Dashboard />
       </div>

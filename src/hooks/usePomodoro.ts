@@ -125,7 +125,7 @@ export function usePomodoro() {
       await window.electronAPI.resetPomodoro();
       setSession(null);
       setIsRunning(false);
-      
+
       // Reset time based on settings
       const focusDuration = parseInt(settings.focus_duration || '25') * 60 * 1000;
       setTimeRemaining(focusDuration);
@@ -139,7 +139,7 @@ export function usePomodoro() {
       await window.electronAPI.resetPomodoro();
       setSession(null);
       setIsRunning(false);
-      
+
       // If we were in a focus session, start a break
       // This is handled by the main process when session completes
       const focusDuration = parseInt(settings.focus_duration || '25') * 60 * 1000;
@@ -149,20 +149,23 @@ export function usePomodoro() {
     }
   }, [settings]);
 
-  const updateSettings = useCallback(async (newSettings: Record<string, string>) => {
-    try {
-      await window.electronAPI.updatePomodoroSettings(newSettings);
-      setSettings(newSettings);
-      
-      // Update time remaining if no session is active
-      if (!session) {
-        const focusDuration = parseInt(newSettings.focus_duration || '25') * 60 * 1000;
-        setTimeRemaining(focusDuration);
+  const updateSettings = useCallback(
+    async (newSettings: Record<string, string>) => {
+      try {
+        await window.electronAPI.updatePomodoroSettings(newSettings);
+        setSettings(newSettings);
+
+        // Update time remaining if no session is active
+        if (!session) {
+          const focusDuration = parseInt(newSettings.focus_duration || '25') * 60 * 1000;
+          setTimeRemaining(focusDuration);
+        }
+      } catch (error) {
+        console.error('Failed to update settings:', error);
       }
-    } catch (error) {
-      console.error('Failed to update settings:', error);
-    }
-  }, [session]);
+    },
+    [session]
+  );
 
   return {
     session,

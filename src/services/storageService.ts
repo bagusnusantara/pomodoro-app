@@ -1,16 +1,12 @@
 /**
  * Storage Service
- * 
+ *
  * Handles local storage for web fallback and caching
  */
 
 const STORAGE_PREFIX = 'pomotask_';
 
-export type StorageKey = 
-  | 'theme'
-  | 'settings'
-  | 'lastTask'
-  | 'onboardingComplete';
+export type StorageKey = 'theme' | 'settings' | 'lastTask' | 'onboardingComplete';
 
 class StorageService {
   /**
@@ -57,7 +53,7 @@ class StorageService {
   clear(): void {
     try {
       const keys = Object.keys(localStorage);
-      keys.forEach(key => {
+      keys.forEach((key) => {
         if (key.startsWith(STORAGE_PREFIX)) {
           localStorage.removeItem(key);
         }
@@ -74,8 +70,8 @@ class StorageService {
     try {
       const keys = Object.keys(localStorage);
       return keys
-        .filter(key => key.startsWith(STORAGE_PREFIX))
-        .map(key => key.replace(STORAGE_PREFIX, '') as StorageKey);
+        .filter((key) => key.startsWith(STORAGE_PREFIX))
+        .map((key) => key.replace(STORAGE_PREFIX, '') as StorageKey);
     } catch (error) {
       console.error('Failed to get storage keys:', error);
       return [];
@@ -101,7 +97,10 @@ class StorageService {
     let size = 0;
     try {
       for (const key in localStorage) {
-        if (Object.prototype.hasOwnProperty.call(localStorage, key) && key.startsWith(STORAGE_PREFIX)) {
+        if (
+          Object.prototype.hasOwnProperty.call(localStorage, key) &&
+          key.startsWith(STORAGE_PREFIX)
+        ) {
           size += localStorage[key].length * 2; // UTF-16 characters
         }
       }
